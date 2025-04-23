@@ -1,0 +1,81 @@
+# User Registration API Documentation
+
+## Endpoint
+
+`POST /users/register`
+
+## Description
+
+Registers a new user in the system. Requires a first name, last name, email, and password. Returns a JWT token and the created user object on success.
+
+## Request Body
+
+Send a JSON object with the following structure:
+
+```json
+{
+  "fullName": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "yourpassword"
+}
+```
+
+### Field Requirements
+
+- `fullName.firstName`: String, required, minimum 3 characters
+- `fullName.lastName`: String, required, minimum 3 characters
+- `email`: String, required, must be a valid email address
+- `password`: String, required, minimum 6 characters
+
+## Responses
+
+### Success
+
+- **Status Code:** `201 Created`
+- **Body:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "user": {
+      "_id": "<user_id>",
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "email": "john.doe@example.com",
+      "socketId": null
+    }
+  }
+  ```
+
+### Validation Error
+
+- **Status Code:** `422 Unprocessable Entity`
+- **Body:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "First name must be at least 3 characters long",
+        "param": "fullName.firstName",
+        "location": "body"
+      },
+      ...
+    ]
+  }
+  ```
+
+### Example Request
+
+```sh
+curl -X POST http://localhost:4000/users/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": { "firstName": "John", "lastName": "Doe" },
+    "email": "john.doe@example.com",
+    "password": "yourpassword"
+  }'
+```

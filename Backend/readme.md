@@ -62,8 +62,7 @@ Send a JSON object with the following structure:
         "msg": "First name must be at least 3 characters long",
         "param": "fullName.firstName",
         "location": "body"
-      },
-      ...
+      }
     ]
   }
   ```
@@ -140,8 +139,7 @@ Send a JSON object with the following structure:
         "msg": "Invalid email address",
         "param": "email",
         "location": "body"
-      },
-      ...
+      }
     ]
   }
   ```
@@ -265,4 +263,124 @@ Logs out the authenticated user by clearing the authentication cookie and blackl
 ```sh
 curl -X GET http://localhost:4000/users/logout \
   -H "Authorization: Bearer <jwt_token>"
+```
+
+---
+
+# Captain Registration API Documentation
+
+## Endpoint
+
+`POST /captains/register`
+
+## Description
+
+Registers a new captain (driver) in the system. Requires full name, email, password, and vehicle details. Returns a JWT token and the created captain object on success.
+
+## Request Body
+
+Send a JSON object with the following structure:
+
+```json
+{
+  "fullName": {
+    "firstName": "Jane",
+    "lastName": "Smith"
+  },
+  "email": "jane.smith@example.com",
+  "password": "yourpassword",
+  "vehicle": {
+    "color": "red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Field Requirements
+
+- `fullName.firstName`: String, required, minimum 4 characters
+- `fullName.lastName`: String, required, minimum 4 characters
+- `email`: String, required, must be a valid email address
+- `password`: String, required, minimum 6 characters
+- `vehicle.color`: String, required
+- `vehicle.plate`: String, required
+- `vehicle.capacity`: Integer, required, minimum 1
+- `vehicle.vehicleType`: String, required, one of `car`, `bike`, `auto`
+
+## Responses
+
+### Success
+
+- **Status Code:** `201 Created`
+- **Body:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "captain": {
+      "_id": "<captain_id>",
+      "fullName": {
+        "firstName": "Jane",
+        "lastName": "Smith"
+      },
+      "email": "jane.smith@example.com",
+      "socketId": null,
+      "status": "inactive",
+      "vehicle": {
+        "color": "red",
+        "plate": "ABC123",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      "location": {
+        "lat": null,
+        "lng": null
+      }
+    }
+  }
+  ```
+
+### Validation Error
+
+- **Status Code:** `422 Unprocessable Entity`
+- **Body:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "First name must be at least 4 characters long",
+        "param": "fullName.firstName",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+### Conflict
+
+- **Status Code:** `409 Conflict`
+- **Body:**
+  ```json
+  {
+    "message": "Captain already exists"
+  }
+  ```
+
+### Example Request
+
+```sh
+curl -X POST http://localhost:4000/captains/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": { "firstName": "Jane", "lastName": "Smith" },
+    "email": "jane.smith@example.com",
+    "password": "yourpassword",
+    "vehicle": {
+      "color": "red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }'
 ```
